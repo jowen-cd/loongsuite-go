@@ -23,8 +23,8 @@ import (
 	"github.com/alibaba/loongsuite-go/pkg/api"
 	"github.com/alibaba/loongsuite-go/pkg/inst-api-semconv/instrumenter/experimental"
 	"github.com/nacos-group/nacos-sdk-go/v2/clients/naming_client/naming_cache"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/metric"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/attribute"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/metric"
 )
 
 //go:linkname beforeNewServiceInfoHolder210 github.com/nacos-group/nacos-sdk-go/v2/clients/naming_client/naming_cache.beforeNewServiceInfoHolder210

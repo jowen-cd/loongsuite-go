@@ -18,7 +18,7 @@ import (
 	"context"
 	"go-micro.dev/v5/client"
 	"go-micro.dev/v5/server"
-	"go.opentelemetry.io/otel/propagation"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/propagation"
 )
 
 var goMicroClientInstrument = BuildGoMicroClientInstrumenter()

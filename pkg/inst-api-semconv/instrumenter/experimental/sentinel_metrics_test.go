@@ -18,7 +18,7 @@ import (
 	"os"
 	"testing"
 
-	"go.opentelemetry.io/otel/sdk/metric"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/sdk/metric"
 
 	"github.com/stretchr/testify/assert"
 )

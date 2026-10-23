@@ -17,7 +17,7 @@ package ai
 import (
 	"context"
 
-	"go.opentelemetry.io/otel/attribute"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/attribute"
 )
 
 // GenAISpanKindAttrsExtractor extracts the gen_ai.span.kind attribute from requests.

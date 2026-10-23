@@ -24,9 +24,9 @@ import (
 
 	"github.com/alibaba/loongsuite-go/pkg/inst-api-semconv/instrumenter/utils"
 	"github.com/alibaba/loongsuite-go/pkg/inst-api/instrumenter"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/metric"
-	semconv "go.opentelemetry.io/otel/semconv/v1.30.0"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/attribute"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/metric"
+	semconv "github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/semconv/v1.30.0"
 )
 
 // GenAI metrics instrumentation (Stability: development).

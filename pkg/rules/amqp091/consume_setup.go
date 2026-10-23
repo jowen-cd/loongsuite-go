@@ -20,9 +20,9 @@ import (
 
 	"github.com/alibaba/loongsuite-go/pkg/api"
 	amqp "github.com/rabbitmq/amqp091-go"
-	"go.opentelemetry.io/otel/attribute"
-	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
-	"go.opentelemetry.io/otel/trace"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/attribute"
+	semconv "github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/semconv/v1.26.0"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/trace"
 )
 
 //go:linkname consumeOnEnter github.com/rabbitmq/amqp091-go.consumeOnEnter

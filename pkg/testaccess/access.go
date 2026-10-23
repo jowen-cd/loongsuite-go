@@ -19,10 +19,10 @@ import (
 	"os"
 
 	"github.com/mohae/deepcopy"
-	"go.opentelemetry.io/otel/sdk/metric"
-	"go.opentelemetry.io/otel/sdk/metric/metricdata"
-	"go.opentelemetry.io/otel/sdk/trace"
-	"go.opentelemetry.io/otel/sdk/trace/tracetest"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/sdk/metric"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/sdk/metric/metricdata"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/sdk/trace"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/sdk/trace/tracetest"
 )
 
 const IS_IN_TEST = "IN_OTEL_TEST"

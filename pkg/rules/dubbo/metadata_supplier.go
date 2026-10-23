@@ -19,9 +19,9 @@ import (
 )
 
 import (
-	"go.opentelemetry.io/otel/baggage"
-	"go.opentelemetry.io/otel/propagation"
-	"go.opentelemetry.io/otel/trace"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/baggage"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/propagation"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/trace"
 )
 
 type dubboMetadataSupplier struct {

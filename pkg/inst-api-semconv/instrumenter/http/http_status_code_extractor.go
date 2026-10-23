@@ -15,8 +15,8 @@
 package http
 
 import (
-	"go.opentelemetry.io/otel/codes"
-	"go.opentelemetry.io/otel/trace"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/codes"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/trace"
 )
 
 type HttpClientSpanStatusExtractor[REQUEST any, RESPONSE any] struct {

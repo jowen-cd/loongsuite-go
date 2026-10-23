@@ -26,13 +26,13 @@ import (
 	"github.com/alibaba/loongsuite-go/pkg/inst-api/version"
 	"github.com/apache/rocketmq-client-go/v2/consumer"
 	"github.com/apache/rocketmq-client-go/v2/primitive"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/codes"
-	"go.opentelemetry.io/otel/propagation"
-	"go.opentelemetry.io/otel/sdk/instrumentation"
-	semconv "go.opentelemetry.io/otel/semconv/v1.30.0"
-	"go.opentelemetry.io/otel/trace"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/attribute"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/codes"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/propagation"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/sdk/instrumentation"
+	semconv "github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/semconv/v1.30.0"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/trace"
 )
 
 // Instrumentation control

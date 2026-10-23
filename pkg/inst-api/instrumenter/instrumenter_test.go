@@ -17,18 +17,18 @@ package instrumenter
 import (
 	"context"
 	"errors"
-	"go.opentelemetry.io/otel/sdk/trace/tracetest"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/sdk/trace/tracetest"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/propagation"
-	"go.opentelemetry.io/otel/sdk/instrumentation"
-	sdktrace "go.opentelemetry.io/otel/sdk/trace"
-	"go.opentelemetry.io/otel/trace"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/propagation"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/sdk/instrumentation"
+	sdktrace "github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/sdk/trace"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/trace"
 
-	"go.opentelemetry.io/otel/attribute"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/attribute"
 )
 
 type testRequest struct {

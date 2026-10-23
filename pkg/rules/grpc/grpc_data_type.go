@@ -15,7 +15,7 @@
 package grpc
 
 import (
-	"go.opentelemetry.io/otel/propagation"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/propagation"
 )
 
 const (

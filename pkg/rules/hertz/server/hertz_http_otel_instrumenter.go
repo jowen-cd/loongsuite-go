@@ -17,7 +17,7 @@ package server
 import (
 	"github.com/alibaba/loongsuite-go/pkg/inst-api/utils"
 	"github.com/alibaba/loongsuite-go/pkg/inst-api/version"
-	"go.opentelemetry.io/otel/sdk/instrumentation"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/sdk/instrumentation"
 	"net/url"
 	"strconv"
 
@@ -26,8 +26,8 @@ import (
 	"github.com/alibaba/loongsuite-go/pkg/inst-api-semconv/instrumenter/http"
 	"github.com/alibaba/loongsuite-go/pkg/inst-api-semconv/instrumenter/net"
 	"github.com/alibaba/loongsuite-go/pkg/inst-api/instrumenter"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/propagation"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/propagation"
 )
 
 func GetRequest(req *protocol.Request) (dst *protocol.Request) {

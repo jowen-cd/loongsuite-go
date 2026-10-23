@@ -23,9 +23,9 @@ import (
 
 	"github.com/IBM/sarama"
 	"github.com/alibaba/loongsuite-go/pkg/api"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/propagation"
-	"go.opentelemetry.io/otel/trace"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/propagation"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/trace"
 )
 
 const producerContextCacheMax = 16384

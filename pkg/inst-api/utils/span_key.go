@@ -14,7 +14,7 @@
 
 package utils
 
-import "go.opentelemetry.io/otel/attribute"
+import "github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/attribute"
 
 const DB_CLIENT_KEY = attribute.Key("opentelemetry-traces-span-key-db-client")
 

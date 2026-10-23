@@ -20,8 +20,8 @@ import (
 
 	"github.com/alibaba/loongsuite-go/pkg/api"
 	cron "github.com/robfig/cron/v3"
-	"go.opentelemetry.io/otel"
-	oteltrace "go.opentelemetry.io/otel/trace"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel"
+	oteltrace "github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/trace"
 )
 
 //go:linkname cronRunOnEnter github.com/robfig/cron/v3.cronRunOnEnter

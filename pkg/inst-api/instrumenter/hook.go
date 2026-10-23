@@ -18,7 +18,7 @@ import (
 	"context"
 	"time"
 
-	"go.opentelemetry.io/otel/attribute"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/attribute"
 )
 
 type OperationListener interface {

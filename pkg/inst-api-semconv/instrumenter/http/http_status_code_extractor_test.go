@@ -16,10 +16,10 @@ package http
 
 import (
 	"errors"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/codes"
-	sdktrace "go.opentelemetry.io/otel/sdk/trace"
-	"go.opentelemetry.io/otel/trace"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/attribute"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/codes"
+	sdktrace "github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/sdk/trace"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/trace"
 	"testing"
 )
 

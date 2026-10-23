@@ -19,12 +19,12 @@ import (
 	"testing"
 
 	"github.com/alibaba/loongsuite-go/pkg/inst-api-semconv/instrumenter/ai"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
-	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/attribute"
+	sdkmetric "github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/sdk/metric"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
-	"go.opentelemetry.io/otel/sdk/trace/tracetest"
-	"go.opentelemetry.io/otel/trace"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/sdk/trace/tracetest"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/trace"
 )
 
 func setupTracer() *tracetest.InMemoryExporter {

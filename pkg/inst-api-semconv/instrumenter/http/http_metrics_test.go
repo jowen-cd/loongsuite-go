@@ -17,11 +17,11 @@ package http
 import (
 	"context"
 	"github.com/alibaba/loongsuite-go/pkg/inst-api-semconv/instrumenter/utils"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/sdk/metric"
-	"go.opentelemetry.io/otel/sdk/metric/metricdata"
-	"go.opentelemetry.io/otel/sdk/resource"
-	semconv "go.opentelemetry.io/otel/semconv/v1.30.0"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/attribute"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/sdk/metric"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/sdk/metric/metricdata"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/sdk/resource"
+	semconv "github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/semconv/v1.30.0"
 	"testing"
 	"time"
 )

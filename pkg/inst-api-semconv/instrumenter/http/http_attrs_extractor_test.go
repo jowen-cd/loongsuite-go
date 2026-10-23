@@ -22,9 +22,9 @@ import (
 	"testing"
 
 	"github.com/alibaba/loongsuite-go/pkg/inst-api-semconv/instrumenter/net"
-	"go.opentelemetry.io/otel/attribute"
-	semconv "go.opentelemetry.io/otel/semconv/v1.30.0"
-	"go.opentelemetry.io/otel/trace"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/attribute"
+	semconv "github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/semconv/v1.30.0"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/trace"
 )
 
 type httpServerAttrsGetter struct {

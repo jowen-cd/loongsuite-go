@@ -20,15 +20,15 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"go.opentelemetry.io/otel/sdk/metric"
-	"go.opentelemetry.io/otel/sdk/metric/metricdata"
-	"go.opentelemetry.io/otel/sdk/trace/tracetest"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/sdk/metric"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/sdk/metric/metricdata"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/sdk/trace/tracetest"
 
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/sdk/instrumentation"
-	"go.opentelemetry.io/otel/sdk/resource"
-	sdktrace "go.opentelemetry.io/otel/sdk/trace"
-	"go.opentelemetry.io/otel/trace"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/attribute"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/sdk/instrumentation"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/sdk/resource"
+	sdktrace "github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/sdk/trace"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/trace"
 )
 
 type testSpan struct {

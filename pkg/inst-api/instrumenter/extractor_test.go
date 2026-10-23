@@ -18,9 +18,9 @@ import (
 	"errors"
 	"testing"
 
-	"go.opentelemetry.io/otel/codes"
-	"go.opentelemetry.io/otel/trace"
-	"go.opentelemetry.io/otel/trace/noop"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/codes"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/trace"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/trace/noop"
 )
 
 type testSpan struct {

@@ -21,11 +21,11 @@ import (
 
 	"github.com/smallnest/rpcx/client"
 	"github.com/smallnest/rpcx/share"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/codes"
-	"go.opentelemetry.io/otel/propagation"
-	"go.opentelemetry.io/otel/sdk/instrumentation"
-	"go.opentelemetry.io/otel/trace"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/codes"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/propagation"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/sdk/instrumentation"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/trace"
 
 	"github.com/alibaba/loongsuite-go/pkg/inst-api-semconv/instrumenter/rpc"
 	"github.com/alibaba/loongsuite-go/pkg/inst-api/instrumenter"

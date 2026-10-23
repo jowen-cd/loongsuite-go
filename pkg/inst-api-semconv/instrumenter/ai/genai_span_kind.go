@@ -14,7 +14,7 @@
 
 package ai
 
-import "go.opentelemetry.io/otel/attribute"
+import "github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/attribute"
 
 // GenAISpanKind represents the type of span in a GenAI/LLM application.
 type GenAISpanKind string

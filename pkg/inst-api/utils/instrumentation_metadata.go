@@ -14,7 +14,7 @@
 
 package utils
 
-import "go.opentelemetry.io/otel/attribute"
+import "github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/attribute"
 
 // InstrumentationCategory represents the semantic category of an instrumentation
 type InstrumentationCategory string

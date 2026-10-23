@@ -20,8 +20,8 @@ import (
 	"testing"
 
 	"github.com/alibaba/loongsuite-go/pkg/inst-api/utils"
-	"go.opentelemetry.io/otel/attribute"
-	semconv "go.opentelemetry.io/otel/semconv/v1.30.0"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/attribute"
+	semconv "github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/semconv/v1.30.0"
 )
 
 type testRequest struct {

@@ -18,7 +18,7 @@ import (
 	"context"
 	"github.com/alibaba/loongsuite-go/pkg/api"
 	"github.com/redis/rueidis"
-	"go.opentelemetry.io/otel/trace"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/trace"
 	"os"
 	"strings"
 	"time"

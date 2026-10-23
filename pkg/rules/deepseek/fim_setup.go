@@ -25,9 +25,9 @@ import (
 
 	"github.com/alibaba/loongsuite-go/pkg/api"
 	openai "github.com/cohesion-org/deepseek-go"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/codes"
-	oteltrace "go.opentelemetry.io/otel/trace"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/attribute"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/codes"
+	oteltrace "github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/trace"
 )
 
 //go:linkname deepseekCreateFIMCompletionOnEnter github.com/cohesion-org/deepseek-go.deepseekCreateFIMCompletionOnEnter

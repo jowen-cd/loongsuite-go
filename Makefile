@@ -22,7 +22,7 @@ CURRENT_ARCH := $(shell uname -m | sed 's/aarch64/arm64/;s/armv7l/arm/;s/armv6l/
 MOD_NAME := github.com/alibaba/loongsuite-go
 STRIP_DEBUG := -s -w
 
-OUTPUT_BASE = otel
+OUTPUT_BASE = otel1.13
 OUTPUT_DARWIN_AMD64 = $(OUTPUT_BASE)-darwin-amd64
 OUTPUT_LINUX_AMD64 = $(OUTPUT_BASE)-linux-amd64
 OUTPUT_WINDOWS_AMD64 = $(OUTPUT_BASE)-windows-amd64.exe

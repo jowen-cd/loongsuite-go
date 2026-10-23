@@ -9,7 +9,7 @@ import (
 
 	"github.com/alibaba/loongsuite-go/pkg/api"
 	redis "github.com/go-redis/redis/v8"
-	"go.opentelemetry.io/otel/trace"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/trace"
 )
 
 var redisv8Instrumenter = BuildRedisv8Instrumenter()

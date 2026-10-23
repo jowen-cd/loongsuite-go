@@ -20,8 +20,8 @@ import (
 	"github.com/cloudwego/kitex/pkg/endpoint"
 	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2/metadata"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
-	semconv "go.opentelemetry.io/otel/semconv/v1.30.0"
-	sdktrace "go.opentelemetry.io/otel/trace"
+	semconv "github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/semconv/v1.30.0"
+	sdktrace "github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/trace"
 )
 
 var kitexServerInstrumenter = BuildKitexServerInstrumenter()

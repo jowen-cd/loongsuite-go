@@ -21,7 +21,7 @@ import (
 
 	"github.com/alibaba/loongsuite-go/pkg/api"
 	"github.com/mochi-mqtt/server/v2/packets"
-	"go.opentelemetry.io/otel/trace"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/trace"
 )
 
 //go:linkname processPublishOnEnter github.com/mochi-mqtt/server/v2.processPublishOnEnter

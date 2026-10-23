@@ -18,7 +18,7 @@ import (
 	"log"
 	"os"
 
-	"go.opentelemetry.io/otel/metric"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/metric"
 )
 
 type sentinelEnabler struct{}

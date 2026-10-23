@@ -16,15 +16,15 @@ package instrumenter
 
 import (
 	"context"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/sdk/instrumentation"
-	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/sdk/instrumentation"
+	sdktrace "github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/sdk/trace"
 	"testing"
 
 	"github.com/alibaba/loongsuite-go/pkg/inst-api/utils"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/trace"
-	"go.opentelemetry.io/otel/trace/noop"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/attribute"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/trace"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/trace/noop"
 )
 
 func TestNoopSpanSuppressor(t *testing.T) {

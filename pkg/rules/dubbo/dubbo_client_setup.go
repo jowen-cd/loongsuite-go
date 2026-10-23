@@ -20,7 +20,7 @@ import (
 
 	"dubbo.apache.org/dubbo-go/v3/protocol"
 	"github.com/alibaba/loongsuite-go/pkg/api"
-	"go.opentelemetry.io/otel"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel"
 )
 
 var dubboClientInstrumenter = BuildDubboClientInstrumenter()

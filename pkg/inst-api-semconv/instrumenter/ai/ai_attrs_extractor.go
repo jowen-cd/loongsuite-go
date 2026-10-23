@@ -16,9 +16,9 @@ package ai
 
 import (
 	"context"
-	"go.opentelemetry.io/otel/attribute"
-	semconv "go.opentelemetry.io/otel/semconv/v1.30.0"
-	semconv7 "go.opentelemetry.io/otel/semconv/v1.37.0"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/attribute"
+	semconv "github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/semconv/v1.30.0"
+	semconv7 "github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/semconv/v1.37.0"
 )
 
 // TODO: remove server.address and put it into NetworkAttributesExtractor

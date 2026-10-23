@@ -26,8 +26,8 @@ import (
 	"github.com/nacos-group/nacos-sdk-go/v2/clients/naming_client/naming_http"
 	"github.com/nacos-group/nacos-sdk-go/v2/common/constant"
 	"github.com/nacos-group/nacos-sdk-go/v2/common/nacos_server"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/metric"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/attribute"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/metric"
 )
 
 //go:linkname beforeNewBeatReactor github.com/nacos-group/nacos-sdk-go/v2/clients/naming_client/naming_http.beforeNewBeatReactor

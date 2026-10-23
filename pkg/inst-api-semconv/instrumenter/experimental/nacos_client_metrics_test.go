@@ -15,7 +15,7 @@
 package experimental
 
 import (
-	"go.opentelemetry.io/otel/sdk/metric"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/sdk/metric"
 	"os"
 	"testing"
 

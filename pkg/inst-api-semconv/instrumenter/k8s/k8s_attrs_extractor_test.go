@@ -19,7 +19,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"go.opentelemetry.io/otel/attribute"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/attribute"
 )
 
 type testK8sEventRequest struct {

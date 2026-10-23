@@ -18,10 +18,10 @@ import (
 	"context"
 	"github.com/alibaba/loongsuite-go/pkg/inst-api/utils"
 	"github.com/alibaba/loongsuite-go/pkg/inst-api/version"
-	"go.opentelemetry.io/otel/sdk/instrumentation"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/sdk/instrumentation"
 
 	"github.com/alibaba/loongsuite-go/pkg/inst-api/instrumenter"
-	"go.opentelemetry.io/otel/attribute"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/attribute"
 )
 
 const kratos_protocol_type = "kratos.protocol.type"

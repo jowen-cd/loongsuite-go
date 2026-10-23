@@ -19,9 +19,9 @@ import (
 
 	"github.com/alibaba/loongsuite-go/pkg/inst-api/utils"
 
-	"go.opentelemetry.io/otel/attribute"
-	ottrace "go.opentelemetry.io/otel/sdk/trace"
-	"go.opentelemetry.io/otel/trace"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/attribute"
+	ottrace "github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/sdk/trace"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/trace"
 )
 
 // getScopeKey returns the appropriate span key based on scope name and span kind

@@ -53,6 +53,7 @@ type DepProcessor struct {
 	vendorMode    bool
 	pkgModDir     string // Local module cache path of alibaba-otel pkg module
 	otelRuntimeGo string // Path to the otel.runtime.go file
+	userHasOtel   bool   // Whether the user's go.mod depends on go.opentelemetry.io/otel
 }
 
 func newDepProcessor() *DepProcessor {
@@ -61,6 +62,7 @@ func newDepProcessor() *DepProcessor {
 		vendorMode:    false,
 		pkgModDir:     "",
 		otelRuntimeGo: "",
+		userHasOtel:   false,
 	}
 	return dp
 }

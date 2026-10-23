@@ -21,7 +21,7 @@ import (
 
 	"github.com/IBM/sarama"
 	"github.com/alibaba/loongsuite-go/pkg/api"
-	"go.opentelemetry.io/otel"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel"
 )
 
 //go:linkname consumePartitionOnEnter github.com/IBM/sarama.consumePartitionOnEnter

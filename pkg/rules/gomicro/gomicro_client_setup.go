@@ -24,10 +24,10 @@ import (
 	"go-micro.dev/v5/metadata"
 	"go-micro.dev/v5/registry"
 	"go-micro.dev/v5/selector"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/propagation"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/propagation"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
-	semconv "go.opentelemetry.io/otel/semconv/v1.30.0"
+	semconv "github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/semconv/v1.30.0"
 )
 
 type clientV5Wrapper struct {

@@ -22,8 +22,8 @@ import (
 	"github.com/alibaba/loongsuite-go/pkg/inst-api/instrumenter"
 	"github.com/alibaba/loongsuite-go/pkg/inst-api/utils"
 	"github.com/alibaba/loongsuite-go/pkg/inst-api/version"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/sdk/instrumentation"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/attribute"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/sdk/instrumentation"
 )
 
 // --- LLM span getters ---

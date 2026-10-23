@@ -18,14 +18,14 @@ import (
 	"fmt"
 	"github.com/alibaba/loongsuite-go/pkg/inst-api/utils"
 	"github.com/alibaba/loongsuite-go/pkg/inst-api/version"
-	"go.opentelemetry.io/otel/sdk/instrumentation"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/sdk/instrumentation"
 	"os"
 	"strings"
 
 	"github.com/alibaba/loongsuite-go/pkg/inst-api-semconv/instrumenter/rpc"
 	"github.com/alibaba/loongsuite-go/pkg/inst-api/instrumenter"
-	"go.opentelemetry.io/otel/codes"
-	"go.opentelemetry.io/otel/trace"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/codes"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/trace"
 )
 
 type grpcInnerEnabler struct {

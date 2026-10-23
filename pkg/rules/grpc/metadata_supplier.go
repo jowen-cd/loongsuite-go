@@ -17,7 +17,7 @@ package grpc
 import (
 	"context"
 
-	"go.opentelemetry.io/otel/propagation"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/propagation"
 	"google.golang.org/grpc/metadata"
 )
 

@@ -21,7 +21,7 @@ import (
 	"github.com/alibaba/loongsuite-go/pkg/api"
 	"github.com/alibaba/loongsuite-go/pkg/inst-api-semconv/instrumenter/ai"
 	"github.com/tmc/langchaingo/chains"
-	"go.opentelemetry.io/otel/trace"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/trace"
 )
 
 //go:linkname callChainOnEnter github.com/tmc/langchaingo/chains.callChainOnEnter

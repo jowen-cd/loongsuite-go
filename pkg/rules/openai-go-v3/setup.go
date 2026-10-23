@@ -27,10 +27,10 @@ import (
 	"github.com/alibaba/loongsuite-go/pkg/api"
 	openai "github.com/openai/openai-go/v3"
 	"github.com/openai/openai-go/v3/option"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/codes"
-	"go.opentelemetry.io/otel/trace"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/attribute"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/codes"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/trace"
 )
 
 var instrumentationEnabled = os.Getenv("OTEL_INSTRUMENTATION_OPENAI_ENABLED") != "false"

@@ -339,6 +339,22 @@ func (dp *DepProcessor) initMod() (err error) {
 	if dp.pkgModDir == "" {
 		return ex.Newf("cannot find rule cache dir")
 	}
+	// Path-A fork: detect whether the user's go.mod already depends on
+	// go.opentelemetry.io/otel. The generated otel.runtime.go blank-imports
+	// the user's OTel modules only in that case, so projects without OTel do
+	// not gain an OTel dependency; the user's OTel packages only need to be
+	// linked when the rules/otsdk bridge (or the otel-sdk GLS rules) applies.
+	modfile, err := parseGoMod(dp.getGoModPath())
+	if err != nil {
+		return err
+	}
+	for _, r := range modfile.Require {
+		if r.Mod.Path == "go.opentelemetry.io/otel" {
+			dp.userHasOtel = true
+			break
+		}
+	}
+	util.Log("User module depends on go.opentelemetry.io/otel: %v", dp.userHasOtel)
 	return nil
 }
 func (dp *DepProcessor) initBuildMode() {

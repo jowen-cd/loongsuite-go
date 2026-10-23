@@ -20,7 +20,7 @@ import (
 	"github.com/alibaba/loongsuite-go/pkg/inst-api/utils"
 	"github.com/alibaba/loongsuite-go/pkg/inst-api/version"
 	"github.com/go-redis/redis/v8"
-	"go.opentelemetry.io/otel/sdk/instrumentation"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/sdk/instrumentation"
 )
 
 type goRedisV8AttrsGetter struct {

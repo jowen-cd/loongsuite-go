@@ -20,7 +20,7 @@ import (
 	"testing"
 	"time"
 
-	"go.opentelemetry.io/otel/attribute"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/attribute"
 )
 
 type testListener struct {

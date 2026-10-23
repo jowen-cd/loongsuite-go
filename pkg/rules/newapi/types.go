@@ -17,8 +17,8 @@ package newapi
 import (
 	"os"
 
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/trace"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/trace"
 )
 
 const traceInfoCtxKey = "otel_stream_trace_info"

@@ -21,7 +21,7 @@ import (
 	"github.com/alibaba/loongsuite-go/pkg/inst-api/utils"
 	"github.com/alibaba/loongsuite-go/pkg/inst-api/version"
 	redis "github.com/redis/go-redis/v9"
-	"go.opentelemetry.io/otel/sdk/instrumentation"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/sdk/instrumentation"
 	"strconv"
 	"time"
 	"unicode/utf8"

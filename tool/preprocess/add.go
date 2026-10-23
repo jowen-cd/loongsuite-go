@@ -122,11 +122,18 @@ func (dp *DepProcessor) newDeps(bundles []*rules.InstRuleSet) error {
 		"runtime/debug": "_otel_debug",
 		// for log.Printf when declaring printstack/getstack variable
 		"log": "_otel_log",
-		// otel setup
+		// otel setup (the vendored go-sdk fork; no go.opentelemetry.io require)
 		"github.com/alibaba/loongsuite-go/pkg": ast.IdentIgnore,
-		"go.opentelemetry.io/otel":                   ast.IdentIgnore,
-		"go.opentelemetry.io/otel/sdk/trace":         ast.IdentIgnore,
-		"go.opentelemetry.io/otel/baggage":           ast.IdentIgnore,
+	}
+	// Path-A fork: blank-import the user's OTel modules only when the user's
+	// go.mod already depends on go.opentelemetry.io/otel. They exist to link
+	// the instrumented packages (rules/otsdk bridge, otel-sdk GLS rules) into
+	// the binary; injecting them unconditionally would add an OTel dependency
+	// the application never had.
+	if dp.userHasOtel {
+		builtin["go.opentelemetry.io/otel"] = ast.IdentIgnore
+		builtin["go.opentelemetry.io/otel/sdk/trace"] = ast.IdentIgnore
+		builtin["go.opentelemetry.io/otel/baggage"] = ast.IdentIgnore
 	}
 	for pkg, alias := range builtin {
 		content += fmt.Sprintf("import %s %q\n", alias, pkg)

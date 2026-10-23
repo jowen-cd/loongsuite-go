@@ -84,21 +84,36 @@
     "Path": "github.com/alibaba/loongsuite-go/pkg/rules/otel-sdk/metric"
   },
   {
+    "Version": "[1.20.0,)",
     "ImportPath": "go.opentelemetry.io/otel/trace",
     "Function": "SpanFromContext",
+    "OnEnter": "spanFromContextOnEnter",
     "OnExit": "spanFromContextOnExit",
-    "Path": "github.com/alibaba/loongsuite-go/pkg/rules/otel-context"
+    "Path": "github.com/alibaba/loongsuite-go/pkg/rules/otsdk"
   },
   {
+    "Version": "[1.20.0,)",
+    "ImportPath": "go.opentelemetry.io/otel/trace",
+    "Function": "ContextWithSpanContext",
+    "OnEnter": "contextWithSpanContextOnEnter",
+    "OnExit": "contextWithSpanContextOnExit",
+    "Path": "github.com/alibaba/loongsuite-go/pkg/rules/otsdk"
+  },
+  {
+    "Version": "[1.20.0,)",
     "ImportPath": "go.opentelemetry.io/otel",
-    "FileName": "trace_init.go",
-    "Path": "github.com/alibaba/loongsuite-go/pkg/rules/otel-sdk/provider/trace"
+    "Function": "GetTracerProvider",
+    "OnEnter": "getTracerProviderOnEnter",
+    "OnExit": "getTracerProviderOnExit",
+    "Path": "github.com/alibaba/loongsuite-go/pkg/rules/otsdk"
   },
   {
+    "Version": "[1.20.0,)",
     "ImportPath": "go.opentelemetry.io/otel",
     "Function": "SetTracerProvider",
     "OnEnter": "setTracerProviderOnEnter",
-    "Path": "github.com/alibaba/loongsuite-go/pkg/rules/otel-sdk/provider/trace_provider"
+    "OnExit": "setTracerProviderOnExit",
+    "Path": "github.com/alibaba/loongsuite-go/pkg/rules/otsdk"
   },
   {
     "ImportPath": "go.opentelemetry.io/otel/baggage",

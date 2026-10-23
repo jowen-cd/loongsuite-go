@@ -17,7 +17,7 @@ package k8s
 import (
 	"context"
 
-	"go.opentelemetry.io/otel/attribute"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/attribute"
 )
 
 type K8sEventAttrsExtractor[REQUEST any, RESPONSE any, GETTER K8sEventAttrsGetter[REQUEST, RESPONSE]] struct {

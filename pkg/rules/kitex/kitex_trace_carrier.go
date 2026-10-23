@@ -17,7 +17,7 @@ package kitex
 import (
 	"context"
 
-	oteltrace "go.opentelemetry.io/otel/trace"
+	oteltrace "github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/trace"
 )
 
 type traceCarrierContextKeyType struct{}

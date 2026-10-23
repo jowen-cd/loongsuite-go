@@ -19,14 +19,14 @@ import (
 
 	"github.com/alibaba/loongsuite-go/pkg/inst-api/utils"
 	"github.com/alibaba/loongsuite-go/pkg/inst-api/version"
-	"go.opentelemetry.io/otel/sdk/instrumentation"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/sdk/instrumentation"
 
 	"github.com/alibaba/loongsuite-go/pkg/inst-api-semconv/instrumenter/http"
 	"github.com/alibaba/loongsuite-go/pkg/inst-api-semconv/instrumenter/net"
 	"github.com/alibaba/loongsuite-go/pkg/inst-api/instrumenter"
 	"github.com/valyala/fasthttp"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/propagation"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/propagation"
 )
 
 var emptyFiberv2Response = fiberv2Response{}

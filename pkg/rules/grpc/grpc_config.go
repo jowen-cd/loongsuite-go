@@ -17,10 +17,10 @@ package grpc
 import (
 	"context"
 
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/propagation"
-	semconv "go.opentelemetry.io/otel/semconv/v1.19.0"
-	"go.opentelemetry.io/otel/trace"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/propagation"
+	semconv "github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/semconv/v1.19.0"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/trace"
 	"google.golang.org/grpc/stats"
 	"google.golang.org/grpc/status"
 )

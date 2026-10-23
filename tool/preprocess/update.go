@@ -30,20 +30,12 @@ const (
 	pkgPrefix = "github.com/alibaba/loongsuite-go/pkg"
 )
 
+// Path-A fork: the injected pkg module vendors its own OTel copy under
+// pkg/go-sdk and adds NO go.opentelemetry.io replace directives, so the
+// user application's OTel version stays authoritative (MVS picks the max,
+// never a pin). The rules/otsdk bridge adapts the user's OTel to the fork
+// at runtime. Only the genproto anti-ambiguous-import pin remains.
 var otelDeps = map[string]string{
-	"go.opentelemetry.io/otel":                                          "v1.40.0",
-	"go.opentelemetry.io/otel/sdk":                                      "v1.40.0",
-	"go.opentelemetry.io/otel/trace":                                    "v1.40.0",
-	"go.opentelemetry.io/otel/metric":                                   "v1.40.0",
-	"go.opentelemetry.io/otel/sdk/metric":                               "v1.40.0",
-	"go.opentelemetry.io/otel/exporters/otlp/otlptrace":                 "v1.40.0",
-	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc":   "v1.40.0",
-	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp":   "v1.40.0",
-	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc": "v1.40.0",
-	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp": "v1.40.0",
-	"go.opentelemetry.io/otel/exporters/prometheus":                     "v0.61.0",
-	"go.opentelemetry.io/contrib/instrumentation/runtime":               "v0.65.0",
-	"google.golang.org/protobuf":                                        "v1.36.10",
 	// Fix "ambiguous import" between legacy monolithic genproto and split genproto modules:
 	//
 	// Old versions of the monolithic module `google.golang.org/genproto` included packages
@@ -55,10 +47,7 @@ var otelDeps = map[string]string{
 	//
 	// By forcing the monolithic module to a post-split version, it no longer "owns" those
 	// packages, and the ambiguity is resolved without pinning the user's gRPC version.
-	"google.golang.org/genproto":                             "v0.0.0-20251202230838-ff82c1b0f217",
-	"go.opentelemetry.io/otel/exporters/stdout/stdoutmetric": "v1.40.0",
-	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace":  "v1.40.0",
-	"go.opentelemetry.io/otel/exporters/zipkin":              "v1.40.0",
+	"google.golang.org/genproto": "v0.0.0-20251202230838-ff82c1b0f217",
 }
 
 func parseGoMod(gomod string) (*modfile.File, error) {
@@ -200,10 +189,9 @@ func (dp *DepProcessor) updateGoMod() error {
 		ReplaceVersion: "",
 	}
 	addDeps = append(addDeps, dep)
-	// OTel dependencies may publish new versions that are not compatible
-	// with the otel tool. In such cases, we need to add a replace directive
-	// to use certain versions of the OTel dependencies for given otel tool,
-	// otherwise, the otel tool may fail to run.
+	// Path-A fork: no OTel replace directives are injected (see otelDeps).
+	// The user's go.opentelemetry.io/* versions remain authoritative and
+	// are bridged to the vendored go-sdk fork by the rules/otsdk adapters.
 	for path, version := range otelDeps {
 		addDeps = append(addDeps, Dependency{
 			ImportPath:     path,

@@ -17,8 +17,8 @@ package kitex
 import (
 	"context"
 	"github.com/bytedance/gopkg/cloud/metainfo"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/propagation"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/propagation"
 )
 
 var _ propagation.TextMapCarrier = &metadataProvider{}

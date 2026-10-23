@@ -20,8 +20,8 @@ import (
 
 	"github.com/alibaba/loongsuite-go/pkg/api"
 	ants "github.com/panjf2000/ants/v2"
-	"go.opentelemetry.io/otel"
-	oteltrace "go.opentelemetry.io/otel/trace"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel"
+	oteltrace "github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/trace"
 )
 
 //go:linkname antsSubmitOnEnter github.com/panjf2000/ants/v2.antsSubmitOnEnter
