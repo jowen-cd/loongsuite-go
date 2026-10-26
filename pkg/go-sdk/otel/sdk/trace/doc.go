@@ -1,0 +1,13 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
+/*
+Package trace contains support for OpenTelemetry distributed tracing.
+
+The following assumes a basic familiarity with OpenTelemetry concepts.
+See https://opentelemetry.io.
+
+See [github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/sdk/internal/x] for information about
+the experimental features.
+*/
+package trace // import "github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/sdk/trace"

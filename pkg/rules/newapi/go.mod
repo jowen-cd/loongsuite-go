@@ -6,8 +6,6 @@ require (
 	github.com/QuantumNous/new-api v0.12.8
 	github.com/alibaba/loongsuite-go/pkg v0.0.0-20260107074919-08c36b668c42
 	github.com/gin-gonic/gin v1.9.1
-	go.opentelemetry.io/otel v1.40.0
-	go.opentelemetry.io/otel/trace v1.40.0
 )
 
 require (
@@ -70,8 +68,6 @@ require (
 	github.com/ugorji/go/codec v1.2.12 // indirect
 	github.com/yapingcat/gomedia v0.0.0-20240906162731-17feea57090c // indirect
 	github.com/yusufpapurcu/wmi v1.2.3 // indirect
-	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
-	go.opentelemetry.io/otel/metric v1.40.0 // indirect
 	golang.org/x/arch v0.21.0 // indirect
 	golang.org/x/crypto v0.47.0 // indirect
 	golang.org/x/net v0.49.0 // indirect

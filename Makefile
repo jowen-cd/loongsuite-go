@@ -22,7 +22,7 @@ CURRENT_ARCH := $(shell uname -m | sed 's/aarch64/arm64/;s/armv7l/arm/;s/armv6l/
 MOD_NAME := github.com/alibaba/loongsuite-go
 STRIP_DEBUG := -s -w
 
-OUTPUT_BASE = otel1.13
+OUTPUT_BASE = otel-fork
 OUTPUT_DARWIN_AMD64 = $(OUTPUT_BASE)-darwin-amd64
 OUTPUT_LINUX_AMD64 = $(OUTPUT_BASE)-linux-amd64
 OUTPUT_WINDOWS_AMD64 = $(OUTPUT_BASE)-windows-amd64.exe
@@ -133,8 +133,11 @@ install: build
 # The tarball will be placed in tool/data/ directory.
 PKG_GZIP = alibaba-pkg.gz
 PKG_TMP = pkg_tmp
-.PHONY: package-pkg
-package-pkg:
+.PHONY: lint-otel package-pkg
+lint-otel:
+	@echo "Linting otel tool..."
+	@./scripts/check_otel_imports.sh
+package-pkg: lint-otel
 	@echo "Packaging pkg module..."
 	@rm -rf $(PKG_TMP)
 	@cp -a pkg $(PKG_TMP)

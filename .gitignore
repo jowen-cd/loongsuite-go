@@ -7,9 +7,10 @@
 otel-go-auto-instrumentation
 otelbuild
 otelbuild-*
-otel
-otel-*
+/otel
+/otel-*
 !pkg/rules/otel-*
+!pkg/go-sdk/otel/
 *.log
 .otel-build
 
@@ -140,8 +141,8 @@ test/dubbo/v3.3.0/test_dubbo_basictest.test
 test/dubbo/v3.3.0/test_dubbo_basic
 # vim swap files
 *.swp
+*.swo
+*.swn
 # local experiment outputs
-otel1.13
-otel-patha
-pkg/otel_setup.go.bak
 .zcode/
+tmp/
