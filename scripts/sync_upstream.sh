@@ -101,9 +101,24 @@ git rev-parse -q --verify "refs/tags/$TAG^{commit}" >/dev/null \
 # Keep the local mirror identical to upstream, ff-only by construction
 # (git fetch refuses to update a ref non-fast-forward). Never pushes.
 say "stage 1: fetching $UPSTREAM_REMOTE (tags + main ff-only)"
-git fetch "$UPSTREAM_REMOTE" --tags >/dev/null 2>&1 || die "git fetch $UPSTREAM_REMOTE failed"
-git fetch "$UPSTREAM_REMOTE" main:main >/dev/null 2>&1 \
-  || die "local $MIRROR_BRANCH diverged from upstream — resolve by hand (it must be a strict mirror)"
+if ! git fetch "$UPSTREAM_REMOTE" --tags >/dev/null 2>&1; then
+  say "git fetch $UPSTREAM_REMOTE failed (offline?); continuing with local refs"
+fi
+# Compare against the last known upstream/main; only refuse when local main
+# is NOT a fast-forward of it (a real divergence). Being ahead is impossible
+# for a strict mirror, being behind just means the fetch failed/skipped.
+if git rev-parse -q --verify refs/remotes/"$UPSTREAM_REMOTE"/main >/dev/null; then
+  if ! git merge-base --is-ancestor refs/remotes/"$UPSTREAM_REMOTE"/main "$MIRROR_BRANCH"; then
+    die "local $MIRROR_BRANCH diverged from upstream — resolve by hand (it must be a strict mirror)"
+  fi
+  if git fetch "$UPSTREAM_REMOTE" main:main >/dev/null 2>&1; then
+    say "stage 1: local $MIRROR_BRANCH fast-forwarded (or already current)"
+  else
+    say "stage 1: $MIRROR_BRANCH ff-update skipped (offline or already current)"
+  fi
+else
+  die "no $UPSTREAM_REMOTE/main ref; run: git fetch $UPSTREAM_REMOTE main"
+fi
 
 # ---------------------------------------------------------------- stage 2: merge tag
 MERGE_BASE="$(git merge-base HEAD "$TAG" 2>/dev/null || true)"
