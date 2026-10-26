@@ -303,7 +303,14 @@ for spec in "${VERSION_MATRIX[@]}"; do
   cp "$dir/go.mod" "$dir/go.mod.syncbak"
   if [ -f "$dir/go.sum" ]; then cp "$dir/go.sum" "$dir/go.sum.syncbak"; fi
   ok=1
-  if ! (cd "$dir" && "$REPO_ROOT/otel-fork" go build -o /tmp/sync-demo-bin .); then
+  # Pre-tidy: the committed demo go.mods are minimal (no indirect entries) and
+  # go.sum is gitignored, so normalize the module state before the tool's dry
+  # build requires it (fresh clones need this too).
+  if ! (cd "$dir" && go mod tidy); then
+    say "  go mod tidy FAILED for $dir"
+    ok=0
+  fi
+  if [ "$ok" = 1 ] && ! (cd "$dir" && "$REPO_ROOT/otel-fork" go build -o /tmp/sync-demo-bin .); then
     say "  BUILD FAILED for $dir"
     ok=0
   fi
