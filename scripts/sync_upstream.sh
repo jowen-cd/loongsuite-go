@@ -83,17 +83,77 @@ sweep_stale_requires() {
   return $fail
 }
 
+# Deterministic resolution of the recurring go.mod conflict class:
+# upstream bumps/adds otel requires on lines our sweep deleted, so both sides
+# touched the same lines. Resolve by taking the upstream file (keeps its
+# non-otel version bumps) and re-deleting the otel requires — except for
+# whitelisted modules (dev-only manifests that may keep real otel) and
+# pkg/go.sum (extra entries are harmless). pkg/go.mod runs LAST so its
+# `go mod tidy` rewrites go.sum after the theirs checkout, then stages both.
+resolve_gomod_conflicts() {
+  local f dir deps d
+  while IFS= read -r f; do
+    dir="$(dirname "$f")"
+    case "$f" in
+      pkg/go.mod) continue ;;  # handled in the second pass below
+      pkg/go.sum)
+        git checkout --theirs -- "$f" && git add "$f"
+        say "resolved $f (took upstream)"
+        ;;
+      pkg/rules/*/go.mod|pkg/rules/*/*/go.mod|pkg/rules/*/*/*/go.mod)
+        git checkout --theirs -- "$f"
+        if ! is_whitelisted "$dir"; then
+          deps="$(grep -oE '^[[:space:]]+go\.opentelemetry\.io/[A-Za-z0-9/._-]+' "$f" \
+                  | awk '{print $1}' | sort -u || true)"
+          for d in $deps; do
+            (cd "$dir" && go mod edit -droprequire="$d") || return 1
+          done
+        fi
+        git add "$f"
+        if is_whitelisted "$dir"; then
+          say "resolved $f (upstream base; whitelist keeps otel)"
+        else
+          say "resolved $f (upstream base; otel requires dropped)"
+        fi
+        ;;
+    esac
+  done < <(git diff --name-only --diff-filter=U | grep -E '^pkg/(go\.mod|go\.sum|rules/.*/go\.mod)$' || true)
+
+  if git diff --name-only --diff-filter=U | grep -qE '^pkg/go\.mod$'; then
+    git checkout --theirs -- pkg/go.mod
+    deps="$(grep -oE '^[[:space:]]+go\.opentelemetry\.io/[A-Za-z0-9/._-]+' pkg/go.mod \
+            | awk '{print $1}' | sort -u || true)"
+    for d in $deps; do
+      (cd pkg && go mod edit -droprequire="$d") || return 1
+    done
+    # Re-record the grpc-chain otel MVS floor as indirect entries; this also
+    # rewrites go.sum (already checked out to theirs) to match the resolved
+    # go.mod, so stage both afterwards.
+    (cd pkg && go mod tidy) || return 1
+    git add pkg/go.mod && git add pkg/go.sum
+    say "resolved pkg/go.mod (upstream base; otel requires dropped; tidied)"
+  fi
+}
+
 # ---------------------------------------------------------------- stage 0: repo state
 [ -f "$GUARD" ] || die "guard script $GUARD not found (run me on $INTEGRATION_BRANCH)"
-BRANCH="$(git rev-parse --abbrev-ref HEAD)"
-if [ "$BRANCH" != "$INTEGRATION_BRANCH" ]; then
-  if git diff --quiet && git diff --cached --quiet; then
-    git checkout "$INTEGRATION_BRANCH" || die "cannot checkout $INTEGRATION_BRANCH"
-  else
-    die "dirty worktree; commit or stash first (current branch: $BRANCH)"
+if [ -f .git/MERGE_HEAD ]; then
+  # Resume mode: a conflicted merge is exactly the state we continue from.
+  CURRENT_MERGE="$(cat .git/MERGE_HEAD)"
+  [ "$CURRENT_MERGE" = "$(git rev-parse "$TAG^{commit}")" ] \
+    || die "MERGE_HEAD is $CURRENT_MERGE, not $TAG — re-run with that tag (or git merge --abort)"
+  say "stage 0: resuming conflicted merge of $TAG"
+else
+  BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+  if [ "$BRANCH" != "$INTEGRATION_BRANCH" ]; then
+    if git diff --quiet && git diff --cached --quiet; then
+      git checkout "$INTEGRATION_BRANCH" || die "cannot checkout $INTEGRATION_BRANCH"
+    else
+      die "dirty worktree; commit or stash first (current branch: $BRANCH)"
+    fi
   fi
+  git diff --quiet && git diff --cached --quiet || die "dirty worktree on $INTEGRATION_BRANCH"
 fi
-git diff --quiet && git diff --cached --quiet || die "dirty worktree on $INTEGRATION_BRANCH"
 git rev-parse -q --verify "refs/tags/$TAG^{commit}" >/dev/null \
   || die "tag $TAG not found locally; run: git fetch $UPSTREAM_REMOTE --tags"
 
@@ -121,17 +181,38 @@ else
 fi
 
 # ---------------------------------------------------------------- stage 2: merge tag
-MERGE_BASE="$(git merge-base HEAD "$TAG" 2>/dev/null || true)"
 if git merge-base --is-ancestor "$TAG" HEAD 2>/dev/null; then
   say "stage 2: $TAG already merged into $INTEGRATION_BRANCH"
+elif [ -f .git/MERGE_HEAD ]; then
+  say "stage 2: applying deterministic resolutions to the conflicted merge"
+  resolve_gomod_conflicts
+  if git status --porcelain | grep -qE '^(UU|AA|DD|AU|UA|DU|UD)'; then
+    say "remaining conflicts need MANUAL resolution:"
+    git status --porcelain | grep -E '^(UU|AA|DD|AU|UA|DU|UD)' || true
+    say "resolution rule: take the upstream side for everything EXCEPT the"
+    say "go.opentelemetry.io -> pkg/go-sdk import rewrites and the Path-A"
+    say "gutting of otelDeps in tool/preprocess/update.go (keep ours)."
+    say "after 'git add' run me again."
+    exit 2
+  fi
+  git commit --no-edit >/dev/null || die "auto-resolved but 'git commit' failed"
+  say "stage 2: merge committed after deterministic conflict resolution"
 else
   say "stage 2: merging $TAG into $INTEGRATION_BRANCH"
   if ! git merge --no-edit "$TAG"; then
-    say "conflicts unresolved (MERGE_HEAD present). Resolve them, then re-run this script."
-    say "resolution rule: take the upstream side for everything EXCEPT the"
-    say "go.opentelemetry.io -> pkg/go-sdk import rewrites; after 'git add' run me again."
-    git status --porcelain | grep -E '^(UU|AA|DD|AU|UA|DU|UD)' || true
-    exit 2
+    say "merge produced conflicts; applying deterministic go.mod resolutions"
+    resolve_gomod_conflicts
+    if git status --porcelain | grep -qE '^(UU|AA|DD|AU|UA|DU|UD)'; then
+      say "remaining conflicts need MANUAL resolution:"
+      git status --porcelain | grep -E '^(UU|AA|DD|AU|UA|DU|UD)' || true
+      say "resolution rule: take the upstream side for everything EXCEPT the"
+      say "go.opentelemetry.io -> pkg/go-sdk import rewrites and the Path-A"
+      say "gutting of otelDeps in tool/preprocess/update.go (keep ours)."
+      say "after 'git add' run me again."
+      exit 2
+    fi
+    git commit --no-edit >/dev/null || die "auto-resolved but 'git commit' failed"
+    say "stage 2: merge committed after deterministic conflict resolution"
   fi
 fi
 [ -f .git/MERGE_HEAD ] && die "merge still in progress; resolve conflicts and re-run"
