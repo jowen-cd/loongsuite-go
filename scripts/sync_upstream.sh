@@ -240,12 +240,126 @@ make package-pkg || die "make package-pkg failed"
 say "stage 4: make build (produces the otel-fork binary)"
 make build || die "make build failed"
 
-# ---------------------------------------------------------------- stage 5: tag
+# ---------------------------------------------------------------- stage 5: version-matrix regression
+# Build the demo matrix with the freshly built otel-fork to prove the OTel
+# isolation contract end to end. All three tiers guard the same floor
+# discipline:
+#   - grpc-demo      : no-otel user project -> otel enters only via the
+#                      upstream golog/goslog rule cascade (stdlib log rules are
+#                      ungated and every real project hits them), so the
+#                      injected otel must equal the tool floor exactly;
+#                      an empty graph is the even better outcome.
+#   - otel-low-demo  : user otel BELOW the GLS floor    -> raised to >= v1.39.0
+#   - otel-high-demo : user otel above the tool floor   -> user version wins
+# go.mod/go.sum/otel.runtime.go/.otel-build are restored/removed afterwards.
+#
+# Freshness rule for otel-high-demo: the demo pin must stay above the tool
+# floor (= max otel require across the whitelisted rule modules; non-
+# whitelisted ones are guaranteed otel-free by the guard, and the vendored
+# go-sdk baseline never participates in user MVS). Whenever the floor catches
+# up with the pin, the demo is bumped to the latest otel release — unless the
+# tool itself is already at the latest, in which case pin == floor == latest
+# is the accepted boundary (user at the floor, no bump).
+FLOOR_SOFT_CEILING=v1.40.0   # floor discipline: warn when the low demo resolves above this
+
+ver_ge() { [ "$(printf '%s\n' "$1" "$2" | sort -V | head -1)" = "$2" ]; }
+
+tool_floor() {
+  grep -rhoE 'go\.opentelemetry\.io/otel v[0-9]+\.[0-9]+\.[0-9]+' pkg/rules --include=go.mod \
+    | awk '{print $2}' | sort -V | tail -1
+}
+
+latest_otel() {
+  go list -m -versions go.opentelemetry.io/otel 2>/dev/null | awk '{print $NF}'
+}
+
+HIGH_DEMO=example/otel-high-demo
+FLOOR="$(tool_floor)"
+say "stage 5: tool otel floor is ${FLOOR:-none}"
+if LATEST="$(latest_otel)" && [ -n "$LATEST" ]; then
+  PIN="$(grep -oE 'go\.opentelemetry\.io/otel v[0-9]+\.[0-9]+\.[0-9]+' "$HIGH_DEMO/go.mod" | head -1 | awk '{print $2}')"
+  if [ -n "$FLOOR" ] && [ -n "$PIN" ] && ! ver_ge "$PIN" "$FLOOR" && [ "$(printf '%s\n' "$FLOOR" "$LATEST" | sort -V | tail -1)" = "$LATEST" ] && [ "$FLOOR" != "$LATEST" ]; then
+    say "stage 5: tool floor $FLOOR caught up with demo pin $PIN; bumping $HIGH_DEMO to latest $LATEST"
+    (cd "$HIGH_DEMO" \
+      && go mod edit -require="go.opentelemetry.io/otel@$LATEST" -require="go.opentelemetry.io/otel/sdk@$LATEST" \
+      && go mod tidy) || die "failed to bump $HIGH_DEMO to $LATEST"
+    say "stage 5: bump is part of this sync's review diff — remember to commit it"
+  elif [ -n "$PIN" ] && ! ver_ge "$PIN" "$FLOOR" && [ "$FLOOR" = "$LATEST" ]; then
+    say "stage 5: tool floor $FLOOR is already the latest otel release; keeping demo pin $PIN (boundary case)"
+  fi
+else
+  say "stage 5: could not query latest otel version (offline?); freshness check skipped — verify the demo pin by hand"
+fi
+
+VERSION_MATRIX=(
+  "example/grpc-demo|floor"
+  "example/otel-low-demo|ge|v1.39.0"
+  "$HIGH_DEMO|eq|pin"
+)
+for spec in "${VERSION_MATRIX[@]}"; do
+  dir="${spec%%|*}"; rest="${spec#*|}"; mode="${rest%%|*}"; expect="${rest#*|}"
+  [ "$expect" = pin ] && expect="$(grep -oE 'go\.opentelemetry\.io/otel v[0-9]+\.[0-9]+\.[0-9]+' "$dir/go.mod" | head -1 | awk '{print $2}')"
+  say "stage 5: regression build $dir (expect: $mode ${expect:-no-otel})"
+  cp "$dir/go.mod" "$dir/go.mod.syncbak"
+  if [ -f "$dir/go.sum" ]; then cp "$dir/go.sum" "$dir/go.sum.syncbak"; fi
+  ok=1
+  if ! (cd "$dir" && "$REPO_ROOT/otel-fork" go build -o /tmp/sync-demo-bin .); then
+    say "  BUILD FAILED for $dir"
+    ok=0
+  fi
+  if [ "$ok" = 1 ]; then
+    # The tool restores go.mod on success, so the ground truth of what MVS
+    # actually resolved is the module metadata embedded in the built binary.
+    resolved="$(go version -m /tmp/sync-demo-bin 2>/dev/null | awk '$1=="dep" && $2=="go.opentelemetry.io/otel" {print $3}')"
+    case "$mode" in
+      floor)
+        # No-otel project: otel may enter via the upstream golog/goslog rule
+        # cascade (ungated stdlib log rules; net/http and grpc all hit them),
+        # but it must be brought in exactly at the tool floor — nothing
+        # higher. An empty graph is the even better outcome.
+        if [ -z "$resolved" ]; then
+          say "  no otel in graph, as required"
+        elif [ "$resolved" = "$FLOOR" ]; then
+          say "  otel injected at the tool floor $resolved (upstream golog/goslog cascade)"
+          if [ -n "$FLOOR_SOFT_CEILING" ] && ! ver_ge "$FLOOR_SOFT_CEILING" "$resolved"; then
+            say "  WARNING: floor inflated above $FLOOR_SOFT_CEILING — cap the whitelisted otel requires"
+          fi
+        else
+          say "  FAILED: injected otel $resolved does not match the tool floor ${FLOOR:-none} (a require above the floor leaked in)"; ok=0
+        fi ;;
+      ge)
+        if [ -z "$resolved" ]; then
+          say "  FAILED: otel missing from graph after instrumentation"; ok=0
+        elif ver_ge "$resolved" "$expect"; then
+          say "  resolved go.opentelemetry.io/otel $resolved (>= $expect, GLS injectable)"
+          if [ -n "$FLOOR_SOFT_CEILING" ] && ! ver_ge "$FLOOR_SOFT_CEILING" "$resolved"; then
+            say "  WARNING: floor inflated above $FLOOR_SOFT_CEILING — cap the whitelisted otel requires"
+          fi
+        else
+          say "  FAILED: resolved $resolved < required $expect (GLS hooks would not inject)"; ok=0
+        fi ;;
+      eq)
+        if [ "$resolved" != "$expect" ]; then
+          say "  FAILED: user version did not win: resolved $resolved, expected $expect"; ok=0
+        else
+          say "  user version wins: $resolved"
+        fi ;;
+    esac
+  fi
+  mv "$dir/go.mod.syncbak" "$dir/go.mod"
+  if [ -f "$dir/go.sum.syncbak" ]; then mv "$dir/go.sum.syncbak" "$dir/go.sum"; fi
+  rm -f "$dir/otel.runtime.go" /tmp/sync-demo-bin
+  rm -rf "$dir/.otel-build"
+  [ "$ok" = 1 ] || die "version-matrix regression failed at $dir"
+done
+say "stage 5: version-matrix regression passed"
+
+# ---------------------------------------------------------------- stage 6: tag
 UPSTREAM_HASH="$(git rev-parse "$TAG^{commit}" | cut -c1-12)"
 FORK_TAG="${TAG}-fork"
 if [ "$CREATE_TAG" = 1 ]; then
   if git rev-parse -q --verify "refs/tags/$FORK_TAG" >/dev/null; then
-    say "stage 5: $FORK_TAG already exists, not touching it"
+    say "stage 6: $FORK_TAG already exists, not touching it"
   else
     git tag -a "$FORK_TAG" -m \
       "Fork of upstream $TAG ($UPSTREAM_HASH): vendored OTel SDK (Path A) with isolation guard"
@@ -254,10 +368,12 @@ if [ "$CREATE_TAG" = 1 ]; then
 fi
 
 say "done. manual follow-ups:"
-say "  1. regression: example/grpc-demo and your otel-using project, e.g."
+say "  1. extra regression on your otel-using project, e.g."
 say "     cd /Users/wenjiang/cdfsh_projectspace/cdf-channel-center && otel-fork go build -o main-fork ."
+say "     (grpc-demo + the otel-low/high version matrix already ran in stage 5)"
 say "  2. review, then push by hand:"
 say "     git push origin $INTEGRATION_BRANCH${CREATE_TAG:+ $FORK_TAG}"
 say "  3. if local $MIRROR_BRANCH moved forward, push it too: git push origin $MIRROR_BRANCH"
+say "  4. if stage 5 bumped $HIGH_DEMO, commit that go.mod change too"
 [ "$CREATE_TAG" = 0 ] && say "  (run with --tag to have the fork tag created automatically)"
 exit 0
