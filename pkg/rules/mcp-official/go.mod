@@ -1,6 +1,6 @@
 module github.com/alibaba/loongsuite-go/pkg/rules/mcp-official
 
-go 1.24.0
+go 1.25.0
 
 replace github.com/alibaba/loongsuite-go/pkg => ../../../pkg
 
@@ -11,10 +11,10 @@ require (
 
 require (
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
-	github.com/go-logr/logr v1.4.3 // indirect
+	github.com/go-logr/logr v1.4.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/google/jsonschema-go v0.3.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/yosida95/uritemplate/v3 v3.0.2 // indirect
-	golang.org/x/sys v0.40.0 // indirect
+	golang.org/x/sys v0.47.0 // indirect
 )

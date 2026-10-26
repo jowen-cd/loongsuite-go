@@ -1,8 +1,6 @@
 module github.com/alibaba/loongsuite-go/pkg/rules/streadway-amqp/producer
 
-go 1.24.0
-
-toolchain go1.24.13
+go 1.25.0
 
 replace github.com/alibaba/loongsuite-go/pkg => ../../../../pkg
 
@@ -13,6 +11,6 @@ require (
 
 require (
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
-	github.com/go-logr/logr v1.4.3 // indirect
+	github.com/go-logr/logr v1.4.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 )
