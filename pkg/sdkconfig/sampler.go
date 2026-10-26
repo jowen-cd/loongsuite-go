@@ -24,7 +24,7 @@ import (
 	"strconv"
 	"strings"
 
-	"go.opentelemetry.io/otel/sdk/trace"
+	"github.com/alibaba/loongsuite-go/pkg/go-sdk/otel/sdk/trace"
 )
 
 // Agent-specific sampler variable, kept for deployments that already use it.
