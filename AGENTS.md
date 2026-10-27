@@ -19,7 +19,7 @@
 - `main` 与全部上游 tag **严格镜像上游，零本地改动**。同步只用
   `git fetch upstream && git merge --ff-only upstream/main`（sync_upstream.sh stage 1 会用
   `git fetch upstream main:main` 实现同样的 ff-only 语义）。
-- 所有 fork 定制（Path A 代码、本文件等元文件）都在集成分支 **`internal-otelsdk`** 上。
+- 所有 fork 定制（内置 SDK 隔离改造、本文件等元文件）都在集成分支 **`internal-otelsdk`** 上。
 - 上游发布新 tag 后：`./scripts/sync_upstream.sh <tag> --tag` 走完整流程（见下），验证通过
   后打 **`vX.Y.Z-fork`** annotated tag（message 嵌上游短哈希；发布后不可移动）。tag 一律
   本地打好、人工验证后手动 push。
@@ -31,15 +31,16 @@
 
 ## 兄弟仓库：~/personal/loongsuite-go-agent（历史参考）
 
-同一项目的旧工作副本，Path A 可行性验证在此完成（`path-a-fork` 分支，基于 v1.13.0 合并
-v1.15.0）。**其结论已全部移植到本仓库**，仓库使命已完成，仅作历史对照参考。注意其
-`path-a-fork` 分支因 `.gitignore` 缺陷不自包含（`pkg/go-sdk/otel/` 曾被无锚定的 `otel`
-规则忽略而未入库），本仓库已修复该问题。
+同一项目的旧工作副本，内置 SDK 隔离方案的可行性验证在此完成（`path-a-fork` 分支，基于
+v1.13.0 合并 v1.15.0——分支名里的 "path-a" 是当时的内部路线代号，即本仓库采用的"内置
+vendored SDK"路线）。**其结论已全部移植到本仓库**，仓库使命已完成，仅作历史对照参考。
+注意其 `path-a-fork` 分支因 `.gitignore` 缺陷不自包含（`pkg/go-sdk/otel/` 曾被无锚定的
+`otel` 规则忽略而未入库），本仓库已修复该问题。
 
-## Path A 架构要点（双世界隔离）
+## 隔离架构要点（双世界隔离）
 
-核心：注入用户项目的 `pkg` 模块对 `go.opentelemetry.io/*` 保持零直接依赖；用户应用自己的
-otel 版本不受工具钉扎。
+方案：把 OTel SDK 路径重写后内置进 `pkg/go-sdk/`（vendored，详见下），使注入用户项目的
+`pkg` 模块对 `go.opentelemetry.io/*` 保持零直接依赖；用户应用自己的 otel 版本不受工具钉扎。
 
 - **`pkg/go-sdk/`** 是路径重写的 OTel Go fork（vendored 基线 v1.40.0；otel/sdk 全家 v1.40.0、
   prometheus v0.61.0、contrib runtime v0.65.0、proto/otlp v1.9.0、auto/sdk v1.2.1）。禁止手改，
