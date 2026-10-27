@@ -8,7 +8,7 @@ OpenTelemetry 自动埋点工具——业务代码零改动，构建时加 `otel
 
 | Fork Tag | 对应上游 | 说明 |
 |----------|---------|------|
-| `v1.13.0-fork` | v1.13.0 | Path A 隔离首次落地 |
+| `v1.13.0-fork` | v1.13.0 | 内置 OTel SDK 隔离方案首次落地 |
 | `v1.14.0-fork` | v1.14.0 | 第一次 tag 同步（含 neo4j 漏网 import 修复） |
 | `v1.15.0-fork` | v1.15.0 | 含 sync 自动化脚本与版本矩阵回归 |
 
@@ -22,13 +22,14 @@ OpenTelemetry 自动埋点工具——业务代码零改动，构建时加 `otel
 
 ## 2. 为什么需要这个 fork：上游的问题
 
-上游注入用户项目的东西**带着对 `go.opentelemetry.io` 的真实依赖**，造成两类问题：
+上游注入用户项目的东西**带着对 `go.opentelemetry.io` 的真实依赖**，造成三个问题：
 
-1. **用户模块图被污染**：注入的 pkg 模块 import 真实 otel，其 require 进入用户 MVS 图；
+1. **用户模块图被污染**：注入的 pkg 模块 import 真实 otel，其 require 进入用户 MVS 图，
+   陈旧 require 还会抬高用户可见的版本下限；
 2. **用户 otel 版本被钉死**：上游用 `otelDeps` 这张表往用户 go.mod 写 replace 指令，把用户的
    otel 强制钉到工具指定版本——用户失去版本选择权；
-3. （伴生问题）规则模块的真实 otel import 传入编译期改写器会造成跨包类型不匹配——上游 v1.15.0
-   的 neo4j 规则就因此在用户项目里编译失败。
+3. **跨包类型不匹配**：规则模块的真实 otel import 传入编译期改写器后，与用户 otel 形成
+   两套类型——上游 v1.15.0 的 neo4j 规则就因此在用户项目里编译失败。
 
 ```mermaid
 graph TB
@@ -41,9 +42,12 @@ graph TB
     style T fill:#fdd,stroke:#c00
 ```
 
-## 3. Fork 的工作原理：双世界隔离（Path A）
+## 3. Fork 的工作原理：双世界隔离
 
-fork 把工具对 otel 的使用拆成**两个互不干扰的世界**，中间留一条显式边界：
+fork 的方案一句话：**把整套 OTel SDK 做路径重写后内置进注入模块**（`pkg/go-sdk/`，把
+`go.opentelemetry.io/...` 全部改写为模块内部路径），使注入用户项目的代码对
+`go.opentelemetry.io` 零依赖；用户侧的 otel 则通过一层显式边界协作，而非依赖共享。
+由此形成两个互不干扰的世界：
 
 ```mermaid
 graph TB
@@ -68,11 +72,12 @@ graph TB
 - **工具世界**：agent 自身管线（instrumenter、exporter、指标）全部使用 `pkg/go-sdk/` 内置的
   路径重写版 otel——它是 pkg 模块的内部代码，**不参与用户模块图**，用什么版本与用户无关；
 - **用户世界**：用户自己的 otel 版本原样保留，MVS 中用户版本胜出（前提 ≥ 白名单地板 v1.40.0；
-  低于地板会被抬到地板——这是功能性必需，GLS 钩子只能注入 otel/sdk ≥ v1.39.0）；
+  低于地板会被抬到地板——这是功能性必需：GLS 钩子只能注入 otel/sdk ≥ v1.39.0）；
 - **边界层（白名单）**：必须与"用户的 otel 实例"互操作的规则——otsdk 桥把用户的全局 API
-  调用接入工具管线；GLS 钩子注入用户的 `sdk/trace` 包；框架/日志规则读写用户路径上的 span。
-  它们 import 真实 otel 是**设计使然**（类型同一性，否则跨包类型不匹配），代价是它们的
-  require 构成用户 MVS 地板，因此纪律是**版本压低**。
+  调用接入工具管线；GLS（goroutine-local storage，goroutine 级上下文存取）钩子注入用户的
+  `sdk/trace` 包；框架/日志规则读写用户路径上的 span。它们 import 真实 otel 是**设计使然**
+  （类型同一性，否则跨包类型不匹配），代价是它们的 require 构成用户 MVS 地板，因此纪律是
+  **版本压低**。
 
 一次 gin 请求的 span 协作（为什么白名单必须用真实 otel）：
 
@@ -101,7 +106,7 @@ gitGraph
     commit id: "upstream v1.13.0"
     branch internal-otelsdk
     checkout internal-otelsdk
-    commit id: "Path A 移植+守卫"
+    commit id: "内置 SDK 移植+守卫"
     commit id: "v1.13.0-fork"
     checkout main
     commit id: "upstream..."
@@ -114,8 +119,8 @@ gitGraph
 ```
 
 - **`main`**：上游的严格镜像，零本地改动，只接受 fast-forward；
-- **`internal-otelsdk`**：fork 的全部工作（Path A 代码、脚本、demo），每个上游 tag 合并后打
-  `vX.Y.Z-fork` annotated tag（message 记录上游哈希）；
+- **`internal-otelsdk`**：fork 的全部工作（内置 SDK 隔离改造、同步脚本、版本矩阵 demo），
+  每个上游 tag 合并后打 `vX.Y.Z-fork` annotated tag（message 记录上游哈希）；
 - **`overview`**：本分支，纯文档。
 
 同步由 `scripts/sync_upstream.sh <tag>` 半自动驱动，六个阶段：镜像 main → 合并 tag
