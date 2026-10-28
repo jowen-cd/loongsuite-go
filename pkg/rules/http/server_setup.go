@@ -140,3 +140,7 @@ func (w *writerWrapper) Pusher() (pusher http.Pusher) {
 func (w *writerWrapper) CloseNotify() <-chan bool {
 	return w.ResponseWriter.(http.CloseNotifier).CloseNotify()
 }
+
+func (w *writerWrapper) Unwrap() http.ResponseWriter {
+	return w.ResponseWriter
+}
