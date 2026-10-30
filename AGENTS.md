@@ -105,8 +105,16 @@ vendored SDK"路线）。**其结论已全部移植到本仓库**，仓库使命
 ## 当前已知待办
 
 1. **白名单地板膨胀**：v1.15.0 合并后 15 个白名单模块 otel require 为 v1.45.0（仅 otsdk、
-   aws-sdk-go 保持 v1.40.0），用户 otel < v1.45.0 会被静默抬高。待压回 v1.40.0 并给守卫
-   加"白名单版本 ≤ 基线"检查（版本矩阵软警告持续暴露中）。
+   aws-sdk-go 保持 v1.40.0），用户 otel < v1.45.0 会被静默抬高。两条候选路线二选一：
+   - **小改（压版本）**：压回 v1.40.0 并给守卫加"白名单版本 ≤ 基线"检查
+     （版本矩阵软警告持续暴露中）；
+   - **大改（收缩白名单）**：给 `pkg/go-sdk` 补 GLS（vendor 脚本注入 gls_context.go，
+     同 test_func_holder.go 模式；顺带补上"fork 管线 span 不进 GLS"的缺口）→
+     日志类规则（只要 trace_id/span_id 字符串，纯数据）改用内置版 GetTraceAndSpanId，
+     6 个模块退出白名单 → 框架规则改用内置版 GLS + otsdk 桥兼任两世界 GLS 同步，
+     6 个模块退出白名单 → 最终白名单从 17 组收缩到 2 组（otsdk 桥 + otel-sdk
+     注入文件）。代价：桥复杂度上升（GLS 同步）+ 用户自建 span 与 fork span
+     的跨世界 root 语义需要桥维持。
 2. **vendored 基线 CVE**：v1.40.0 命中 CVE-2026-29181（baggage DoS，v1.41.0 修复）与
    GO-2026-5426（v1.43.0 修复），建议升到 ≥ v1.45.0（pkg 零 otel require 后升级对用户
    无感，只需重跑 vendor 脚本 + 回归）。
