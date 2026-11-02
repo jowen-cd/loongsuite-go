@@ -88,7 +88,10 @@ The detailed usage of `otel` tool can be found in [**Usage**](./docs/user/config
 ./scripts/release.sh                          # 不带参数时，要求当前 HEAD 正好在某个 tag 上
 ./scripts/release.sh --no-upload v1.15.0-fork # 只编译，不上传
 ./scripts/release.sh --no-latest v1.15.0-fork # 上传但不刷新 latest/
+./scripts/release.sh --force v1.15.0-fork     # 覆盖已存在的版本目录，或让 latest/ 回退到旧版本
 ```
+
+两个默认行为值得知道。**已经传过的版本目录不会再传**：发布的版本是不可变的，重复执行同一条发布命令不会有任何副作用，脚本只会提示你“已上传，跳过”；确实要重传（比如修正了错误的产物）就加 `--force`。**latest/ 目录知道自己是谁**：里面有一个 `VERSION` 文件记录当前镜像的版本号，消费方下载它就知道 latest 指向哪次发布；同时脚本会阻止把 latest 刷回旧版本（先发 v1.15.0-fork 再发 v1.14.0-fork 时会报错拒绝），真正要回滚也得加 `--force`。
 
 上传走的是 Nexus 的 raw 仓库 REST 接口（`PUT /repository/...`，HTTP Basic Auth 每次请求带上账号密码，没有单独的登录这一步）。有个曾经踩过的坑值得记一下：二进制文件必须显式带 `Content-Type: application/octet-stream`，否则 Nexus 前面的代理层会直接回 500——脚本里已经处理了，但如果哪天有人手写 curl 上传二进制遇到 500，先想起这一条。
 

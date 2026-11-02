@@ -40,8 +40,10 @@
 # is transferred if auth fails.
 #
 # Usage:
-#   ./scripts/release.sh [tag] [--no-upload] [--no-latest]
+#   ./scripts/release.sh [tag] [--force] [--no-upload] [--no-latest]
 #     tag         git tag to build from (default: the tag HEAD is on)
+#     --force     re-upload even if the tag directory already exists,
+#                 and allow latest/ to move to an OLDER version (rollback)
 #     --no-upload build only
 #     --no-latest  upload but skip the latest/ refresh
 
@@ -59,15 +61,17 @@ CONF="$REPO_ROOT/scripts/.nexus.conf"
 
 NO_UPLOAD=0
 NO_LATEST=0
+FORCE=0
 TAG=""
 for arg in "$@"; do
   case "$arg" in
     --no-upload) NO_UPLOAD=1 ;;
     --no-latest) NO_LATEST=1 ;;
-    -*) echo "usage: $0 [tag] [--no-upload] [--no-latest]" >&2; exit 1 ;;
+    --force)     FORCE=1 ;;
+    -*) echo "usage: $0 [tag] [--force] [--no-upload] [--no-latest]" >&2; exit 1 ;;
     *)  if [ -n "$TAG" ]; then
           echo "ERROR: unexpected extra argument '$arg'" >&2
-          echo "usage: $0 [tag] [--no-upload] [--no-latest]" >&2; exit 1
+          echo "usage: $0 [tag] [--force] [--no-upload] [--no-latest]" >&2; exit 1
         fi
         TAG="$arg" ;;
   esac
@@ -154,6 +158,24 @@ fi
 
 # ---------------------------------------------------------------- upload
 BASE="$NEXUS_URL/repository/$NEXUS_REPO$NEXUS_PATH"
+
+# A published tag directory is immutable: re-running release.sh on an
+# already-uploaded tag is a no-op unless --force is given. SHA256SUMS is
+# written together with the artifacts, so it doubles as the existence probe.
+probe() { # $1 = path relative to $BASE; echoes the HTTP status
+  curl -sS -o /dev/null -w '%{http_code}' --max-time 30 \
+    -u "$NEXUS_USER:$NEXUS_PASS" -I "$BASE/$1"
+}
+if [ "$FORCE" = 0 ]; then
+  EXIST="$(probe "$VERSION/SHA256SUMS")"
+  if [ "$EXIST" = "200" ]; then
+    echo "==> $NEXUS_PATH/$VERSION already uploaded, skipping (released versions are immutable)"
+    echo "    re-upload intentionally with: $0 $TAG --force"
+    echo "==> done"
+    exit 0
+  fi
+fi
+
 upload() { # $1 = local file, $2 = path relative to $BASE
   local s
   # Explicit Content-Type is REQUIRED: with binary bodies and no explicit
@@ -168,20 +190,44 @@ upload() { # $1 = local file, $2 = path relative to $BASE
   [ "$s" = "201" ] || [ "$s" = "200" ] \
     || { echo "ERROR: upload $2 failed (HTTP $s)"; exit 1; }
 }
+upload_text() { # $1 = content, $2 = path relative to $BASE
+  local s
+  s="$(curl -sS -o /dev/null -w '%{http_code}' --max-time 60 \
+       -u "$NEXUS_USER:$NEXUS_PASS" -X PUT \
+       -H "Content-Type: text/plain" \
+       --data-binary "$1" "$BASE/$2")"
+  [ "$s" = "201" ] || [ "$s" = "200" ] \
+    || { echo "ERROR: upload $2 failed (HTTP $s)"; exit 1; }
+}
 for f in "$DIST"/*; do
   name="$(basename "$f")"
   echo "==> $NEXUS_REPO$NEXUS_PATH/$VERSION/$name"
   upload "$f" "$VERSION/$name"
 done
+# Self-describing marker: the tag directory records its own version.
+upload_text "$VERSION" "$VERSION/VERSION"
 
-# Refresh latest/ only for real releases; --no-latest skips it explicitly
-# (e.g. when re-uploading a tag for verification purposes).
+# Refresh latest/ with a monotonic guard: latest/ carries a VERSION file
+# telling consumers which release it mirrors, and moving it to an OLDER
+# version is almost always a mistake (e.g. re-releasing v1.14.0-fork
+# after v1.15.0-fork). --force overrides, e.g. for a deliberate rollback.
 if [ "$NO_LATEST" = 1 ]; then
   echo "==> --no-latest, latest/ untouched"
 else
+  CURRENT="$(curl -sS --max-time 30 \
+    -u "$NEXUS_USER:$NEXUS_PASS" "$BASE/latest/VERSION" 2>/dev/null || true)"
+  if [ -n "$CURRENT" ] && [ "$FORCE" = 0 ]; then
+    NEWER="$(printf '%s\n' "$CURRENT" "$VERSION" | sort -V | tail -1)"
+    if [ "$NEWER" = "$CURRENT" ] && [ "$CURRENT" != "$VERSION" ]; then
+      echo "ERROR: latest/ is at $CURRENT, refusing to move it back to $VERSION"
+      echo "       deliberate rollback? use: $0 $TAG --force"
+      exit 1
+    fi
+  fi
   for f in "$DIST"/*; do
     upload "$f" "latest/$(basename "$f")"
   done
-  echo "==> latest/ refreshed"
+  upload_text "$VERSION" "latest/VERSION"
+  echo "==> latest/ now at $VERSION"
 fi
 echo "==> done"
