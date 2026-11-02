@@ -70,6 +70,36 @@ The detailed usage of `otel` tool can be found in [**Usage**](./docs/user/config
 - [kratos-demo](example/kratos-demo) - Integration with the Kratos framework
 - [kafka-demo](example/kafka-demo) - Kafka consumer message monitoring
 
+# Releasing (fork)
+
+发布一个新版本只需要一条命令：
+
+```bash
+./scripts/release.sh v1.15.0-fork
+```
+
+这条命令背后做了几件事：先把工作区切到指定的 tag（保证编译出来的东西就是这个 tag 的内容，不会出现目录叫 v1.15.0-fork、二进制却是别的代码的情况），然后跑 `make all` 一次性编出五个平台的二进制（darwin/amd64、darwin/arm64、linux/amd64、linux/arm64、windows/amd64，命名统一为 `otel-fork-<os>-<arch>`），连同 SHA256SUMS 一起放到 `dist/<tag>/` 下。如果本地配好了 Nexus 的账号信息，还会把这一目录整个传上去，并把 `latest/` 刷成同一份内容。全部做完后自动切回你原来所在的分支，不用手动收拾。
+
+前提是先准备一份 Nexus 配置。把 `scripts/nexus.conf.example` 复制成 `scripts/.nexus.conf`，填上服务器地址、仓库名、上传根路径和账号——密码不要写进文件，执行前 `export NEXUS_PASS=xxx` 即可（`.nexus.conf` 已在 .gitignore 里，不会误提交）。没配密码时脚本只编译不上传，所以日常构建也可以放心用。
+
+几个常用的变化：
+
+```bash
+./scripts/release.sh                          # 不带参数时，要求当前 HEAD 正好在某个 tag 上
+./scripts/release.sh --no-upload v1.15.0-fork # 只编译，不上传
+./scripts/release.sh --no-latest v1.15.0-fork # 上传但不刷新 latest/
+```
+
+上传走的是 Nexus 的 raw 仓库 REST 接口（`PUT /repository/...`，HTTP Basic Auth 每次请求带上账号密码，没有单独的登录这一步）。有个曾经踩过的坑值得记一下：二进制文件必须显式带 `Content-Type: application/octet-stream`，否则 Nexus 前面的代理层会直接回 500——脚本里已经处理了，但如果哪天有人手写 curl 上传二进制遇到 500，先想起这一条。
+
+上传完成后可以这样核对：
+
+```bash
+curl -s 'https://<nexus>/service/rest/v1/assets?repository=<repo>' | grep -o '<path>/<tag>/[^"]*' | sort
+```
+
+或者直接在浏览器里打开 Nexus 的 browse 页面看那个 tag 目录下是不是六个文件、回环下载一个比对 SHA256SUMS 里的哈希。旧版本的同名文件 PUT 会直接覆盖；文件名不同的旧残留（比如历史上手传的文件）不会自动清理，需要删的话在 Nexus 页面上删或者用 `curl -X DELETE`。
+
 # Supported Libraries
 <details>
  <summary>List of Supported Libraries</summary>

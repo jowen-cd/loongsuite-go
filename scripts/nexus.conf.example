@@ -1,0 +1,11 @@
+# Nexus upload configuration for scripts/release.sh.
+# Copy to scripts/.nexus.conf (or just use environment variables) and
+# KEEP IT OUT OF GIT: add ".nexus.conf" to .gitignore.
+# The password is intentionally not here — export NEXUS_PASS before
+# running the script so it never lands on disk in the repo.
+
+NEXUS_URL=https://nexus.cdfsunrise.com
+NEXUS_REPO=go-agent-version
+NEXUS_PATH=/loongsuite-go
+NEXUS_USER=common-uploader
+# export NEXUS_PASS=... in your shell, not here.

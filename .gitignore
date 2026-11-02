@@ -150,3 +150,8 @@ test/dubbo/v3.3.0/test_dubbo_basic
 *.swn
 # local experiment outputs
 .zcode/
+*.DS_Store
+
+# release script artifacts & nexus credentials
+dist/
+scripts/.nexus.conf
