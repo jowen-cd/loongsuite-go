@@ -1,2 +1,13 @@
 *.swp
 *.swo
+/otel
+/otel-*
+.otel-build
+
+tool/data/alibaba-pkg.gz
+
+.zcode/
+*.DS_Store
+# release script artifacts & nexus credentials
+dist/
+scripts/.nexus.conf
