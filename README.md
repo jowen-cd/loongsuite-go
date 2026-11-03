@@ -3,8 +3,24 @@
 本仓库是 [alibaba/loongsuite-go](https://github.com/alibaba/loongsuite-go) 的 fork：一个 Go 编译期
 OpenTelemetry 自动埋点工具——业务代码零改动，构建时加 `otel-fork` 前缀即可完成插桩。
 
-这个 fork 存在的唯一目的：**解决上游工具与用户项目之间的 OpenTelemetry 依赖冲突**。本分支
-（`overview`）只有这一个 README，不含任何代码；代码在 `internal-otelsdk` 分支。
+这个 fork 存在的唯一目的：**解决上游工具与用户项目之间的 OpenTelemetry 依赖冲突**。
+
+## 0. 这个仓库的分支怎么看
+
+你现在所在的 `overview` 分支只有这一个 README，不含任何代码——它是仓库的"门面"，
+讲清楚这个 fork 是什么、为什么存在、怎么运转。代码和日常工作在其他分支：
+
+| 分支 / ref | 用途 | 规范 |
+|-----------|------|------|
+| `main` | 源仓库（上游）的**严格镜像**，只作同步源用 | 零本地改动，只接受 fast-forward，不直接向它提交 |
+| `internal-otelsdk` | fork 的全部实际工作：隔离改造、同步/发布脚本、版本矩阵 demo | 日常开发与提交都在这里；每个上游 tag 合并验证后从此分支打 fork tag |
+| `overview` | 本分支，纯对外文档 | orphan 分支（与代码历史无共同祖先），永不参与 merge/sync |
+| `vX.Y.Z-fork`（tag） | 每轮同步的发布点，与上游 tag 一一对应 | annotated tag 记录对应上游哈希；发布后不可移动，产物以 tag 内容为准 |
+
+remote 约定：`origin` = 本 fork 仓库，`upstream` = alibaba/loongsuite-go（只读）。
+克隆后 `git remote add upstream https://github.com/alibaba/loongsuite-go.git` 补齐即可
+复现全部工作流；如需向公司内 GitLab 分发，加一个 SSH 形态的 remote 即可（HTTPS 推
+大包在公司网络下会被代理层掐断）。
 
 | Fork Tag | 对应上游 | 说明 |
 |----------|---------|------|
@@ -99,7 +115,7 @@ sequenceDiagram
     B->>B: 返回适配器, span 实际落在工具管线
 ```
 
-## 4. 分支模型与同步流程
+## 4. 同步与发布
 
 ```mermaid
 gitGraph
@@ -118,10 +134,7 @@ gitGraph
     commit id: "upstream 最新"
 ```
 
-- **`main`**：上游的严格镜像，零本地改动，只接受 fast-forward；
-- **`internal-otelsdk`**：fork 的全部工作（内置 SDK 隔离改造、同步脚本、版本矩阵 demo），
-  每个上游 tag 合并后打 `vX.Y.Z-fork` annotated tag（message 记录上游哈希）；
-- **`overview`**：本分支，纯文档。
+### 同步流程
 
 同步由 `scripts/sync_upstream.sh <tag>` 半自动驱动，六个阶段：镜像 main → 合并 tag
 （go.mod 冲突按确定性规则自动解）→ 隔离守卫 → 构建工具 → **版本矩阵回归** → 打 tag。
@@ -133,6 +146,21 @@ gitGraph
 | grpc-demo | 无 otel 项目 | 注入的 otel 恰好等于地板（stdlib log → golog 规则级联是上游设计） |
 | otel-low-demo | otel v1.31.0（低于地板） | 被抬到 ≥ v1.39.0（GLS 硬下限），超过 v1.40.0 报警告 |
 | otel-high-demo | 最新 otel | 用户版本胜出；地板追上 pin 时自动升级 demo 到最新 |
+
+### 发布流程
+
+发布一个版本只需一条命令：
+
+```bash
+./scripts/release.sh v1.15.0-fork
+```
+
+它会检出指定 tag 编译五个平台的二进制（产物名统一 `otel-fork-<os>-<arch>`），连同
+SHA256SUMS 上传到 Nexus 的 `<路径>/<tag>/` 目录并刷新 `latest/`，结束后自动切回你
+原来的分支。发布的版本目录**不可变**——重复执行同一条命令会直接跳过，覆盖需
+`--force`；`latest/VERSION` 文件记录当前指向的版本，且拒绝被旧版本覆盖（回滚同样
+需要 `--force`）。凭据通过 `scripts/.nexus.conf`（不入库）加 `NEXUS_PASS` 环境变量
+配置，详见 internal-otelsdk 分支 README 的 Releasing 一节。
 
 ## 5. 内置 otelsdk 升级指南
 
